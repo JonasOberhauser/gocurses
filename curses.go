@@ -56,3 +56,10 @@ func Endwin() {
 func (w *Window) Addch(y, x int, c int32) {
 	C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(c));
 }
+
+func Keypad(win *Window, tf bool) {
+	var outint int;
+	if tf == true {outint = 1;}
+	if tf == false {outint = 0;}
+	C.keypad((*C.WINDOW)(win), C.int(outint));
+}
