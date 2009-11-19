@@ -7,10 +7,42 @@ package curses
 // #include <curses.h>
 import "C"
 
+import "unsafe"
+
+type void unsafe.Pointer;
+
 type Window C.WINDOW;
 
+// Pointers to the values in curses, which may change.
+var Cols *int = nil;
+var Rows *int = nil;
+
+var Colors *int = nil;
+var ColorPairs *int = nil;
+
+var Tabsize *int = nil;
+
+// The window returned from C.initscr()
+var Stdwin *Window = nil;
+
+// Initializes gocurses
+func init() {
+	Cols = (*int)(void(&C.COLS));
+	Rows = (*int)(void(&C.LINES));
+	
+	Colors = (*int)(void(&C.COLORS));
+	ColorPairs = (*int)(void(&C.COLOR_PAIRS));
+	
+	Tabsize = (*int)(void(&C.TABSIZE));
+}
+
 func Initscr() *Window {
-	return (*Window)(C.initscr());
+	Stdwin = (*Window)(C.initscr());
+	return Stdwin;
+}
+
+func Noecho() {
+	C.noecho();
 }
 
 func Getch() int {
@@ -19,4 +51,8 @@ func Getch() int {
 
 func Endwin() {
 	C.endwin();
+}
+
+func (w *Window) Addch(y, x int, c int32) {
+	C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(c));
 }

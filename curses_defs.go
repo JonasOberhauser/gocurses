@@ -1,4 +1,4 @@
-// godefs -g curses new_curses.c
+// godefs -g curses curses.c
 
 // MACHINE GENERATED - DO NOT EDIT.
 
