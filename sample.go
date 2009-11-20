@@ -7,7 +7,31 @@ func main() {
 	y := 10;
 	Initscr();
 	Noecho();
-	Stdwin.Addch(x, y, '@');
-	for Getch() != 'q' {  }
+	Keypad(Stdwin, true);
+	input(x, y);
 	Endwin();
+}
+
+func input(x, y int) {
+	for {
+		inp := Getch();
+		if inp == 'q' {
+			break;
+		}
+		if inp == KEY_LEFT {
+			x = x - 1;
+		}
+		if inp == KEY_RIGHT {
+			x = x + 1;
+		}
+		if inp == KEY_UP {
+			y = y - 1;
+		}
+		if inp == KEY_DOWN {
+			y = y + 1;
+		}
+		Stdwin.Clear();
+		Stdwin.Addch(x, y, '@');
+		Refresh();
+	}
 }

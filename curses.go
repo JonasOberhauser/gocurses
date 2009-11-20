@@ -63,3 +63,11 @@ func Keypad(win *Window, tf bool) {
 	if tf == false {outint = 0;}
 	C.keypad((*C.WINDOW)(win), C.int(outint));
 }
+
+func Refresh() {
+	C.refresh();
+}
+
+func (win *Window) Clear() {
+	C.wclear((*C.WINDOW)(win));
+}
