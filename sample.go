@@ -32,6 +32,6 @@ func input(x, y int) {
 		}
 		Stdwin.Clear();
 		Stdwin.Addch(x, y, '@');
-		Refresh();
+		Stdwin.Refresh();
 	}
 }

@@ -64,10 +64,30 @@ func Keypad(win *Window, tf bool) {
 	C.keypad((*C.WINDOW)(win), C.int(outint));
 }
 
-func Refresh() {
-	C.refresh();
+func (win *Window) Refresh() {
+	C.wrefresh((*C.WINDOW)(win));
+}
+
+func (win *Window) Redrawln(beg_line, num_lines int) {
+	C.wredrawln((*C.WINDOW)(win), C.int(beg_line), C.int(num_lines));
+}
+
+func (win *Window) Redrawwin() {
+	C.redrawwin((*C.WINDOW)(win));
 }
 
 func (win *Window) Clear() {
 	C.wclear((*C.WINDOW)(win));
+}
+
+func (win *Window) Erase() {
+	C.werase((*C.WINDOW)(win));
+}
+
+func (win *Window) Clrtobot() {
+	C.wclrtobot((*C.WINDOW)(win));
+}
+
+func (win *Window) Clrtoeol() {
+	C.wclrtoeol((*C.WINDOW)(win));
 }
