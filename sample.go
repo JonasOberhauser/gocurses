@@ -7,14 +7,15 @@ func main() {
 	y := 10;
 	Initscr();
 	Noecho();
-	Keypad(Stdwin, true);
+	Curs_set(CURS_HIDE);
+	Stdwin.Keypad(true);
 	input(x, y);
 	Endwin();
 }
 
 func input(x, y int) {
 	for {
-		inp := Getch();
+		inp := Stdwin.Getch();
 		if inp == 'q' {
 			break;
 		}

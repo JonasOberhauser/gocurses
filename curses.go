@@ -7,11 +7,29 @@ package curses
 // #include <curses.h>
 import "C"
 
-import "unsafe"
+import (
+	//"os";
+	"unsafe";
+)
 
 type void unsafe.Pointer;
 
 type Window C.WINDOW;
+
+type CursesError struct {
+	message string;
+}
+
+func (ce CursesError) String() string {
+	return ce.message;
+}
+
+// Cursor options.
+const (
+	CURS_HIDE = iota;
+	CURS_NORM;
+	CURS_HIGH;
+)
 
 // Pointers to the values in curses, which may change.
 var Cols *int = nil;
@@ -38,6 +56,7 @@ func init() {
 
 func Initscr() *Window {
 	Stdwin = (*Window)(C.initscr());
+	
 	return Stdwin;
 }
 
@@ -45,23 +64,40 @@ func Noecho() {
 	C.noecho();
 }
 
-func Getch() int {
-	return int(C.getch());
+func Echo() {
+	C.echo();
+}
+
+func Curs_set(c int) {
+	C.curs_set(C.int(c));
+}
+
+func Cbreak() {
+	C.cbreak();
 }
 
 func Endwin() {
 	C.endwin();
 }
 
-func (w *Window) Addch(y, x int, c int32) {
-	C.mvwaddch((*C.WINDOW)(w), C.int(y), C.int(x), C.chtype(c));
+func (win *Window) Getch() int {
+	return int(C.wgetch((*C.WINDOW)(win)));
 }
 
-func Keypad(win *Window, tf bool) {
+func (win *Window) Addch(x, y int, c int32) {
+	C.mvwaddch((*C.WINDOW)(win), C.int(y), C.int(x), C.chtype(c));
+}
+
+// Normally Y is the first parameter passed in curses.
+func (win *Window) Move(x, y int) {
+	C.wmove((*C.WINDOW)(win), C.int(y), C.int(x));
+}
+
+func (w *Window) Keypad(tf bool) {
 	var outint int;
 	if tf == true {outint = 1;}
 	if tf == false {outint = 0;}
-	C.keypad((*C.WINDOW)(win), C.int(outint));
+	C.keypad((*C.WINDOW)(w), C.int(outint));
 }
 
 func (win *Window) Refresh() {
@@ -72,7 +108,7 @@ func (win *Window) Redrawln(beg_line, num_lines int) {
 	C.wredrawln((*C.WINDOW)(win), C.int(beg_line), C.int(num_lines));
 }
 
-func (win *Window) Redrawwin() {
+func (win *Window) Redraw() {
 	C.redrawwin((*C.WINDOW)(win));
 }
 
