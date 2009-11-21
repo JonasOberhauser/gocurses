@@ -77,6 +77,12 @@ func Subwin(win *Window, rows int16, cols int16, starty int16, startx int16) *Wi
 	return sw;
 }
 
+func Derwin(win *Window, rows int16, cols int16, starty int16, startx int16) *Window {
+	dw := (*Window)(C.derwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)));
+
+	return dw;
+}
+
 func Start_color() os.Error {
 	if int(C.has_colors()) == 0 {
 		return CursesError{"terminal does not support color"};
