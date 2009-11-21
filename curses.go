@@ -65,6 +65,18 @@ func Initscr() (*Window, os.Error) {
 	return Stdwin, nil;
 }
 
+func Newwin(rows int16, cols int16, starty int16, startx int16) *Window {
+	nw := (*Window)(C.newwin(C.int(rows), C.int(cols), C.int(starty), C.int(startx)));
+
+	return nw;
+}
+
+func Subwin(win *Window, rows int16, cols int16, starty int16, startx int16) *Window {
+	sw := (*Window)(C.subwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)));
+
+	return sw;
+}
+
 func Start_color() os.Error {
 	if int(C.has_colors()) == 0 {
 		return CursesError{"terminal does not support color"};
