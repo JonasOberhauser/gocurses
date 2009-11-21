@@ -1,19 +1,45 @@
 package main
 
 import . "curses"
+import "os"
+import "fmt"
 
 func main() {
 	x := 10;
 	y := 10;
+	startGoCurses();
+	defer stopGoCurses();
+	
+	Init_pair(1, COLOR_RED, COLOR_BLACK);
+	
+	loop(x, y);
+}
+
+func startGoCurses() {
 	Initscr();
+	if Stdwin == nil {
+		stopGoCurses();
+		os.Exit(1);
+	}
+	
 	Noecho();
+	
 	Curs_set(CURS_HIDE);
+	
 	Stdwin.Keypad(true);
-	input(x, y);
+	
+	if err := Start_color(); err != nil {
+		fmt.Printf("%s\n", err.String());
+		stopGoCurses();
+		os.Exit(1);
+	}
+}
+
+func stopGoCurses() {
 	Endwin();
 }
 
-func input(x, y int) {
+func loop(x, y int) {
 	for {
 		inp := Stdwin.Getch();
 		if inp == 'q' {
@@ -32,7 +58,7 @@ func input(x, y int) {
 			y = y + 1;
 		}
 		Stdwin.Clear();
-		Stdwin.Addch(x, y, '@');
+		Stdwin.Addch(x, y, '@' | Color_pair(1));
 		Stdwin.Refresh();
 	}
 }

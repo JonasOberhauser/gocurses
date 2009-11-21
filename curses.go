@@ -8,7 +8,7 @@ package curses
 import "C"
 
 import (
-	//"os";
+	"os";
 	"unsafe";
 )
 
@@ -31,7 +31,7 @@ const (
 	CURS_HIGH;
 )
 
-// Pointers to the values in curses, which may change.
+// Pointers to the values in curses, which may change values.
 var Cols *int = nil;
 var Rows *int = nil;
 
@@ -60,6 +60,23 @@ func Initscr() *Window {
 	return Stdwin;
 }
 
+func Start_color() os.Error {
+	if int(C.has_colors()) == 0 {
+		return CursesError{"terminal does not support color"};
+	}
+	C.start_color();
+	
+	return nil;
+}
+
+func Init_pair(pair int16, fg int16, bg int16) {
+	C.init_pair(C.short(pair), C.short(fg), C.short(bg));
+}
+
+func Color_pair(pair int) int32 {
+	return int32(C.COLOR_PAIR(C.int(pair)));
+}
+
 func Noecho() {
 	C.noecho();
 }
@@ -70,6 +87,10 @@ func Echo() {
 
 func Curs_set(c int) {
 	C.curs_set(C.int(c));
+}
+
+func Nocbreak() {
+	C.nocbreak();
 }
 
 func Cbreak() {
