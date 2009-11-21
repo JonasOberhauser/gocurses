@@ -54,10 +54,14 @@ func init() {
 	Tabsize = (*int)(void(&C.TABSIZE));
 }
 
-func Initscr() *Window {
+func Initscr() (*Window, os.Error) {
 	Stdwin = (*Window)(C.initscr());
 	
-	return Stdwin;
+	if Stdwin == nil {
+		return nil, CursesError{"Initscr failed"};
+	}
+	
+	return Stdwin, nil;
 }
 
 func Start_color() os.Error {
@@ -69,44 +73,65 @@ func Start_color() os.Error {
 	return nil;
 }
 
-func Init_pair(pair int16, fg int16, bg int16) {
-	C.init_pair(C.short(pair), C.short(fg), C.short(bg));
+func Init_pair(pair int16, fg int16, bg int16) os.Error {
+	if C.init_pair(C.short(pair), C.short(fg), C.short(bg)) == 0 {
+		return CursesError{"Init_pair failed"};
+	}
+	return nil;
 }
 
 func Color_pair(pair int) int32 {
 	return int32(C.COLOR_PAIR(C.int(pair)));
 }
 
-func Noecho() {
-	C.noecho();
+func Noecho() os.Error {
+	if int(C.noecho()) == 0 {
+		return CursesError{"Noecho failed"};
+	}
+	return nil;
 }
 
-func Echo() {
-	C.echo();
+func Echo() os.Error {
+	if int(C.noecho()) == 0 {
+		return CursesError{"Echo failed"};
+	}
+	return nil;
 }
 
-func Curs_set(c int) {
-	C.curs_set(C.int(c));
+func Curs_set(c int) os.Error {
+	if C.curs_set(C.int(c)) == 0 {
+		return CursesError{"Curs_set failed"};
+	}
+	return nil;
 }
 
-func Nocbreak() {
-	C.nocbreak();
+func Nocbreak() os.Error {
+	if C.nocbreak() == 0 {
+		return CursesError{"Nocbreak failed"};
+	}
+	return nil;
 }
 
-func Cbreak() {
-	C.cbreak();
+func Cbreak() os.Error {
+	if C.cbreak() == 0 {
+		return CursesError{"Cbreak failed"};
+	}
+	return nil;
 }
 
-func Endwin() {
-	C.endwin();
+func Endwin() os.Error {
+	if C.endwin() == 0 {
+		return CursesError{"Endwin failed"};
+	}
+	return nil;
 }
 
 func (win *Window) Getch() int {
 	return int(C.wgetch((*C.WINDOW)(win)));
 }
 
-func (win *Window) Addch(x, y int, c int32) {
-	C.mvwaddch((*C.WINDOW)(win), C.int(y), C.int(x), C.chtype(c));
+func (win *Window) Addch(x, y int, c int32, flags int32) {
+	C.mvwaddch((*C.WINDOW)(win), C.int(y), C.int(x), C.chtype(c) | C.chtype(flags));
 }
 
 // Normally Y is the first parameter passed in curses.
@@ -114,15 +139,21 @@ func (win *Window) Move(x, y int) {
 	C.wmove((*C.WINDOW)(win), C.int(y), C.int(x));
 }
 
-func (w *Window) Keypad(tf bool) {
+func (w *Window) Keypad(tf bool) os.Error {
 	var outint int;
 	if tf == true {outint = 1;}
 	if tf == false {outint = 0;}
-	C.keypad((*C.WINDOW)(w), C.int(outint));
+	if C.keypad((*C.WINDOW)(w), C.int(outint)) == 0 {
+		return CursesError{"Keypad failed"};
+	}
+	return nil;
 }
 
-func (win *Window) Refresh() {
-	C.wrefresh((*C.WINDOW)(win));
+func (win *Window) Refresh() os.Error {
+	if C.wrefresh((*C.WINDOW)(win)) == 0 {
+		return CursesError{"refresh failed"};
+	}
+	return nil;
 }
 
 func (win *Window) Redrawln(beg_line, num_lines int) {

@@ -58,7 +58,7 @@ func loop(x, y int) {
 			y = y + 1;
 		}
 		Stdwin.Clear();
-		Stdwin.Addch(x, y, '@' | Color_pair(1));
+		Stdwin.Addch(x, y, '@', Color_pair(1));
 		Stdwin.Refresh();
 	}
 }
