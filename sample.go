@@ -41,6 +41,7 @@ func stopGoCurses() {
 
 func loop(x, y int) {
 	for {
+		Stdwin.Addstr(0, 0, "Hello,\nworld!", 0);
 		inp := Stdwin.Getch();
 		if inp == 'q' {
 			break;

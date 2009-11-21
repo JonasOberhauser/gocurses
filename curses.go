@@ -8,6 +8,7 @@ package curses
 import "C"
 
 import (
+	"fmt";
 	"os";
 	"unsafe";
 )
@@ -132,6 +133,18 @@ func (win *Window) Getch() int {
 
 func (win *Window) Addch(x, y int, c int32, flags int32) {
 	C.mvwaddch((*C.WINDOW)(win), C.int(y), C.int(x), C.chtype(c) | C.chtype(flags));
+}
+
+// Since CGO currently can't handle varg C functions we'll mimic the
+// ncurses addstr functions.
+func (win *Window) Addstr(x, y int, str string, flags int32, v ...) {
+	newstr := fmt.Sprintf(str, v);
+	
+	win.Move(x, y);
+	
+	for i := 0; i < len(newstr); i++ {
+		C.waddch((*C.WINDOW)(win), C.chtype(newstr[i]) | C.chtype(flags));
+	}
 }
 
 // Normally Y is the first parameter passed in curses.
