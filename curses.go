@@ -71,13 +71,13 @@ func Newwin(rows int16, cols int16, starty int16, startx int16) *Window {
 	return nw;
 }
 
-func Subwin(win *Window, rows int16, cols int16, starty int16, startx int16) *Window {
+func (win *Window) Subwin(rows int16, cols int16, starty int16, startx int16) *Window {
 	sw := (*Window)(C.subwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)));
 
 	return sw;
 }
 
-func Derwin(win *Window, rows int16, cols int16, starty int16, startx int16) *Window {
+func (win *Window) Derwin(rows int16, cols int16, starty int16, startx int16) *Window {
 	dw := (*Window)(C.derwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)));
 
 	return dw;
