@@ -210,3 +210,7 @@ func (win *Window) Clrtobot() {
 func (win *Window) Clrtoeol() {
 	C.wclrtoeol((*C.WINDOW)(win));
 }
+
+func (win *Window) Box(verch, horch int16) {
+	C.box((*C.WINDOW)(win), C.chtype(verch), C.chtype(horch));
+}
