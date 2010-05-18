@@ -48,20 +48,20 @@ var Stdwin *Window = nil;
 func init() {
 	Cols = (*int)(void(&C.COLS));
 	Rows = (*int)(void(&C.LINES));
-	
+
 	Colors = (*int)(void(&C.COLORS));
 	ColorPairs = (*int)(void(&C.COLOR_PAIRS));
-	
+
 	Tabsize = (*int)(void(&C.TABSIZE));
 }
 
 func Initscr() (*Window, os.Error) {
 	Stdwin = (*Window)(C.initscr());
-	
+
 	if Stdwin == nil {
 		return nil, CursesError{"Initscr failed"};
 	}
-	
+
 	return Stdwin, nil;
 }
 
@@ -88,7 +88,7 @@ func Start_color() os.Error {
 		return CursesError{"terminal does not support color"};
 	}
 	C.start_color();
-	
+
 	return nil;
 }
 
@@ -155,11 +155,13 @@ func (win *Window) Addch(x, y int, c int32, flags int32) {
 
 // Since CGO currently can't handle varg C functions we'll mimic the
 // ncurses addstr functions.
-func (win *Window) Addstr(x, y int, str string, flags int32, v ...) {
+// Per Issue 635 the variadic function definition needs to end with 
+// 'v ... interface {}' instead of 'v ...'.
+func (win *Window) Addstr(x, y int, str string, flags int32, v ... interface {}) {
 	newstr := fmt.Sprintf(str, v);
-	
+
 	win.Move(x, y);
-	
+
 	for i := 0; i < len(newstr); i++ {
 		C.waddch((*C.WINDOW)(win), C.chtype(newstr[i]) | C.chtype(flags));
 	}
