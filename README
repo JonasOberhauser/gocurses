@@ -1,0 +1,4 @@
+DIFFERENCES
+
+- Uses an x,y coordinate system rather than y,x to be more intuitive.
+- getmaxyx(win, y, x) becomes x, y := Window.Getmax()

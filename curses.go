@@ -232,3 +232,9 @@ func (win *Window) Box(verch, horch int) {
 func (win *Window) Background(colour int32) {
 	C.wbkgd((*C.WINDOW)(win), C.chtype(colour))
 }
+
+func (win *Window) Getmax() (x, y int) {
+	 x = int(C.getmaxx((*C.WINDOW)(win)))
+	 y = int(C.getmaxy((*C.WINDOW)(win)))
+	 return x, y
+}
