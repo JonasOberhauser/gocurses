@@ -242,7 +242,7 @@ func (win *Window) Getmax() (x, y int) {
 
 func (win *Window) Getstr() (str string, err os.Error) {
 	cstr := C.CString(str)
-	defer C.free(unsafe.Pointer(cstr))
+	//defer C.free(unsafe.Pointer(cstr))
 	if C.wgetstr((*C.WINDOW)(win), cstr) == -1 {
 		return "", CursesError{"wgetstr failed"}
 	}
