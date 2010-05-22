@@ -5,6 +5,7 @@ package curses
 // #define _Bool int
 // #define NCURSES_OPAQUE 1
 // #include <curses.h>
+// #include <stdlib.h>
 import "C"
 
 import (
@@ -65,7 +66,7 @@ func Initscr() (*Window, os.Error) {
 	return Stdwin, nil
 }
 
-func Newwin(rows int, cols int, starty int, startx int) (*Window, os.Error) {
+func Newwin(rows int, cols int, startx int, starty int) (*Window, os.Error) {
 	nw := (*Window)(C.newwin(C.int(rows), C.int(cols), C.int(starty), C.int(startx)))
 
 	if nw == nil {
@@ -75,7 +76,7 @@ func Newwin(rows int, cols int, starty int, startx int) (*Window, os.Error) {
 	return nw, nil
 }
 
-func (win *Window) Subwin(rows int, cols int, starty int, startx int) (*Window, os.Error) {
+func (win *Window) Subwin(rows int, cols int, startx int, starty int) (*Window, os.Error) {
 	sw := (*Window)(C.subwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)))
 
 	if sw == nil {
@@ -85,7 +86,7 @@ func (win *Window) Subwin(rows int, cols int, starty int, startx int) (*Window, 
 	return sw, nil
 }
 
-func (win *Window) Derwin(rows int, cols int, starty int, startx int) (*Window, os.Error) {
+func (win *Window) Derwin(rows int, cols int, startx int, starty int) (*Window, os.Error) {
 	dw := (*Window)(C.derwin((*C.WINDOW)(win), C.int(rows), C.int(cols), C.int(starty), C.int(startx)))
 
 	if dw == nil {
@@ -237,4 +238,13 @@ func (win *Window) Getmax() (x, y int) {
 	 x = int(C.getmaxx((*C.WINDOW)(win)))
 	 y = int(C.getmaxy((*C.WINDOW)(win)))
 	 return x, y
+}
+
+func (win *Window) Getstr() (str string, err os.Error) {
+	cstr := C.CString(str)
+	defer C.free(unsafe.Pointer(cstr))
+	if C.wgetstr((*C.WINDOW)(win), cstr) != 0 {
+		return "", CursesError{"wgetstr failed"}
+	}
+	return str, nil
 }
