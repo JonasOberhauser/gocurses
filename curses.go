@@ -124,7 +124,7 @@ func Noecho() os.Error {
 }
 
 func Echo() os.Error {
-	if int(C.noecho()) == 0 {
+	if int(C.echo()) == 0 {
 		return CursesError{"Echo failed"}
 	}
 	return nil
