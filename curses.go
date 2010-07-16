@@ -156,11 +156,11 @@ func Noecho() os.Error {
 func Echo() os.Error {
         in()
         defer out()
-        if int(C.noecho()) == 0 {
+        if int(C.echo()) == 0 {
                 return CursesError{"Echo failed"}
-        }                                        
-        return nil                               
-}                                                
+        }
+        return nil
+}                  
 
 func Curs_set(c int) os.Error {
         in()
