@@ -286,15 +286,17 @@ func (win *Window) Erase() {
 	C.werase((*C.WINDOW)(win))
 }
 
-func (win *Window) Clrtobot() {
+func (win *Window) Clrtobot(x,y int) {
 	in()
 	defer out()
+	win.move(x,y)
 	C.wclrtobot((*C.WINDOW)(win))
 }
 
-func (win *Window) Clrtoeol() {
+func (win *Window) Clrtoeol(x,y int) {
 	in()
 	defer out()
+	win.move(x,y)
 	C.wclrtoeol((*C.WINDOW)(win))
 }
 
@@ -308,6 +310,25 @@ func (win *Window) Background(colour int32) {
 	in()
 	defer out()
 	C.wbkgd((*C.WINDOW)(win), C.chtype(colour))
+}
+
+func (win *Window) Noutrefresh() {
+	in()
+	defer out()
+	C.wnoutrefresh((*C.WINDOW)(win))
+}
+func (win *Window) Touchwin() {
+	in()
+	defer out()
+	C.touchwin((*C.WINDOW)(win))
+}
+
+func (win *Window) Getbeg() (x, y int) {
+	in()
+	defer out()
+	x = int(C.getbegx((*C.WINDOW)(win)))
+	y = int(C.getbegy((*C.WINDOW)(win)))
+	return x, y
 }
 
 func (win *Window) Getmax() (x, y int) {
@@ -326,4 +347,10 @@ func (win *Window) Getstr() (str string, err os.Error) {
 	}
 	s := C.GoString(cstr)
 	return s, nil
+}
+
+func DoUpdate() {
+	in()
+	defer out()
+	C.doupdate()
 }
