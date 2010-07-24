@@ -3,9 +3,10 @@ include $(GOROOT)/src/Make.$(GOARCH)
 TARG=curses
 
 GOFILES=curses_defs.go
-CGOFILES=curses.go
+CGOFILES=curses.go \
+	panel.go \
 
-CGO_LDFLAGS=-lncurses
+CGO_LDFLAGS=-lpanel -lncurses 
 
 CLEANFILES+=
 

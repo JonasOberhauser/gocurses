@@ -212,15 +212,29 @@ func (win *Window) Addch(x, y int, c int32, flags int32) {
 // ncurses addstr functions.
 // Per Issue 635 the variadic function definition needs to end with
 // 'v ... interface {}' instead of 'v ...'.
-func (win *Window) Addstr(x, y int, str string, flags int32, v ...interface{}) {
+func (win *Window) Addstr(x0, y0 int, str string, flags int32, v ...interface{}) {
 	in()
 	defer out()
 	newstr := fmt.Sprintf(str, v)
 
+	x,y := x0,y0
 	win.move(x, y)
+	maxx,maxy := win.getmax()
+	if x0 >= 1 { maxx -= 1 }
 
 	for _, ch := range newstr {
-		C.waddch((*C.WINDOW)(win), C.chtype(ch)|C.chtype(flags))
+		if ch == '\n' || x == maxx {
+			x = x0
+			y += 1
+			win.move(x, y)
+		} 
+		if ch != '\n' {
+			if y > maxy {
+				break
+			}
+			x += 1
+			C.waddch((*C.WINDOW)(win), C.chtype(ch)|C.chtype(flags))
+		}
 	}
 }
 
@@ -331,12 +345,18 @@ func (win *Window) Getbeg() (x, y int) {
 	return x, y
 }
 
-func (win *Window) Getmax() (x, y int) {
-	in()
-	defer out()
+
+// non-atomic getmax. Doesn't block and has to be used as part of other atomic functions to prevent deadlocks.
+func (win *Window) getmax() (x, y int) {
 	x = int(C.getmaxx((*C.WINDOW)(win)))
 	y = int(C.getmaxy((*C.WINDOW)(win)))
 	return x, y
+}
+
+func (win *Window) Getmax() (x, y int) {
+	in()
+	defer out()
+	return win.getmax()
 }
 
 func (win *Window) Getstr() (str string, err os.Error) {

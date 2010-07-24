@@ -5,12 +5,13 @@ import "os"
 import "fmt"
 
 func main() {
-	x := 10
-	y := 10
 	startGoCurses()
 	defer stopGoCurses()
 	Init_pair(1, COLOR_RED, COLOR_BLACK)
 
+	x := *Cols / 2
+	y := *Rows / 2
+	
 	loop(x, y)
 }
 
@@ -25,6 +26,8 @@ func startGoCurses() {
 
 	Curs_set(CURS_HIDE)
 	Stdwin.Keypad(true)
+	
+	Stdwin.Addstr( 0, 3, "Cols %v / Rows %v ", 0, *Cols, *Rows )
 
 	if err := Start_color(); err != nil {
 		fmt.Printf("%s\n", err.String())
@@ -39,26 +42,67 @@ func stopGoCurses() {
 }
 
 func loop(x, y int) {
-	for {
-		Stdwin.Addstr(0, 0, "Hello,\nworld!", 0)
-		inp := Stdwin.Getch()
-		if inp == 'q' {
-			break
-		}
-		if inp == KEY_LEFT {
-			x = x - 1
-		}
-		if inp == KEY_RIGHT {
-			x = x + 1
-		}
-		if inp == KEY_UP {
-			y = y - 1
-		}
-		if inp == KEY_DOWN {
-			y = y + 1
-		}
+	Stdwin.Addstr(0, 0, "Hello,", 0)
+	Stdwin.Addstr(0, 1, "world!", 0)
+	Stdwin.Addstr(3, 2, "Press p for panels or the famous 'any' for a moving cursor test.", 0)
+	if inp := Stdwin.Getch(); inp == 'p' {
 		Stdwin.Clear()
-		Stdwin.Addch(x, y, '@', Color_pair(1))
+		w, _ := Stdwin.Subwin( 20, 12, x, y )
+		w.Box( '|', '-' )
+		p, _ := NewPanel( w )
+		
+		w.Addstr(1, 1, "Press q to quit.", 0)
+		w.Addstr(1, 2, "Press any of the Arrow-Keys to move the cursor.", 0)
+		
+		
+		w2, _ := Stdwin.Subwin( 30, 20, 2, 2 )
+		w2.Box( '|', '-' )
+		p2, _ := NewPanel( w2 )
+		
+		w2.Addstr(1, 1, "This is another window for you to look at...", 0)
+		w2.Addstr(1, 0, "YET-ANOTHER-WINDOW", 0)
+		w2.Addstr(1, 1, "Below: %vAbove: %v", 0,  p2.Below(), p2.Above() )
+		
 		Stdwin.Refresh()
+		
+		
+		for ; inp != 'q'; inp = Stdwin.Getch()  {
+			switch inp {
+			case KEY_LEFT: x -= 1
+			case KEY_RIGHT: x += 1
+			case KEY_UP: y -= 1 
+			case KEY_DOWN: y += 1
+			}
+			
+			maxx,maxy := Stdwin.Getmax()
+			winx,winy := w.Getmax()
+			maxx-= winx-1
+			maxy-= winy-1 
+			x=(x+maxx)%maxx
+			y=(y+maxy)%maxy
+			
+			p.Move( x, y )
+			UpdatePanels()
+			Stdwin.Refresh()
+		}
+	} else {
+		Stdwin.Clear()
+		for ; inp != 'q'; inp = Stdwin.Getch()  {
+			switch inp {
+			case KEY_LEFT: x -= 1
+			case KEY_RIGHT: x += 1
+			case KEY_UP: y -= 1 
+			case KEY_DOWN: y += 1
+			}
+			maxx,maxy := Stdwin.Getmax()
+			x=(x+maxx)%maxx
+			y=(y+maxy)%maxy
+			
+			Stdwin.Clear()
+			Stdwin.Addstr(10, 1, "Press q to quit.", 0)
+			Stdwin.Addstr(10, 2, "Press any of the Arrow-Keys to move the cursor.", 0)
+			Stdwin.Addch(x, y, '@', Color_pair(1))
+			Stdwin.Refresh()
+		}
 	}
 }
