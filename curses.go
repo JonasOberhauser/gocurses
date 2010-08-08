@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"unsafe"
+	"strings"
 )
 
 type void unsafe.Pointer
@@ -208,6 +209,15 @@ func (win *Window) Addch(x, y int, c int32, flags int32) {
 	C.mvwaddch((*C.WINDOW)(win), C.int(y), C.int(x), C.chtype(c)|C.chtype(flags))
 }
 
+
+// Internal non-blocking addstr
+func (win *Window) addstr ( x,y int, str string, flags int32 ) {
+	win.move(x, y)
+	for _, ch := range str {
+		C.waddch((*C.WINDOW)(win), C.chtype(ch)|C.chtype(flags))
+	}
+}
+
 // Since CGO currently can't handle varg C functions we'll mimic the
 // ncurses addstr functions.
 // Per Issue 635 the variadic function definition needs to end with
@@ -216,27 +226,41 @@ func (win *Window) Addstr(x0, y0 int, str string, flags int32, v ...interface{})
 	in()
 	defer out()
 	newstr := fmt.Sprintf(str, v)
-
-	x,y := x0,y0
-	win.move(x, y)
-	maxx,maxy := win.getmax()
-	if x0 >= 1 { maxx -= 1 }
-
-	for _, ch := range newstr {
-		if ch == '\n' || x == maxx {
-			x = x0
-			y += 1
-			win.move(x, y)
-		} 
-		if ch != '\n' {
-			if y > maxy {
-				break
-			}
-			x += 1
-			C.waddch((*C.WINDOW)(win), C.chtype(ch)|C.chtype(flags))
-		}
-	}
+	win.addstr( x0, y0, newstr, flags )
 }
+
+// Like AddStr, just that it tries to nicely align the string within the window.
+// A very simplistic algorithm. Whenever a newline starts or the next word is too long, we go
+// to the next line and perform a carriage return. 
+func (win *Window) AddStrAlign(x0, y0 int, str string, flags int32, v ...interface{}) {
+	in()
+	defer out()
+	lines := strings.Split( fmt.Sprintf(str, v), "\n", -1 )
+	
+	x,y := x0,y0
+	maxx,_ := win.getmax()
+	if x0 >= 1 { 
+		maxx -= 1 
+	}
+
+	for _, line := range lines {
+		words := strings.Split( line, " ", -1 )
+		for _, word := range words {
+			l := len( word )
+			if x + l > maxx {
+				y += 1 // add one line when word is too long
+				x = x0 // carriage return
+			}
+			win.move( x, y )
+			win.addstr( x, y, word, flags )
+			x += l + 1 // +1 for space
+		}
+		y += 1 // add one line after newlines
+		x = x0 // carriage return
+	}
+	
+}
+
 
 // Non-atomic move, needs to be called by atomic funcs in order to prevent deadlocks.
 func (win *Window) move(x, y int) {

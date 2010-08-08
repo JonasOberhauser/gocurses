@@ -51,20 +51,21 @@ func loop(x, y int) {
 		w.Box( '|', '-' )
 		p, _ := NewPanel( w )
 		
-		w.Addstr(1, 1, "Press q to quit.", 0)
-		w.Addstr(1, 2, "Press any of the Arrow-Keys to move the cursor.", 0)
+		w.AddstrAlign(1, 1, "Press q to quit.", 0)
+		w.AddstrAlign(1, 2, "Press any of the Arrow-Keys to move this window.\nPress t to toggle if this window is on the top or not.", 0)
 		
 		
 		w2, _ := Stdwin.Subwin( 30, 20, 2, 2 )
 		w2.Box( '|', '-' )
 		p2, _ := NewPanel( w2 )
 		
-		w2.Addstr(1, 1, "This is another window for you to look at...", 0)
-		w2.Addstr(1, 0, "YET-ANOTHER-WINDOW", 0)
-		w2.Addstr(1, 1, "Below: %vAbove: %v", 0,  p2.Below(), p2.Above() )
+		w2.AddstrAlign(1, 1, "This is another window for you to look at...", 0)
+		w2.AddstrAlign(1, 3, "Press h to hide this window", 0)
+		w2.AddstrAlign(1, 0, "YET-ANOTHER-WINDOW", 0)
+		w2.AddstrAlign(1, 4, "Below: %v\nAbove: %v", 0,  p2.Below(), p2.Above() )
 		
 		Stdwin.Refresh()
-		
+		DoUpdate()
 		
 		for ; inp != 'q'; inp = Stdwin.Getch()  {
 			switch inp {
@@ -72,6 +73,10 @@ func loop(x, y int) {
 			case KEY_RIGHT: x += 1
 			case KEY_UP: y -= 1 
 			case KEY_DOWN: y += 1
+			case 'h': 
+				p2.Hide( !p2.Hidden() )
+			case 'r': 
+				p2.Delete()
 			}
 			
 			maxx,maxy := Stdwin.Getmax()
@@ -82,8 +87,9 @@ func loop(x, y int) {
 			y=(y+maxy)%maxy
 			
 			p.Move( x, y )
-			UpdatePanels()
 			Stdwin.Refresh()
+			UpdatePanels()
+			DoUpdate()
 		}
 	} else {
 		Stdwin.Clear()
@@ -100,7 +106,7 @@ func loop(x, y int) {
 			
 			Stdwin.Clear()
 			Stdwin.Addstr(10, 1, "Press q to quit.", 0)
-			Stdwin.Addstr(10, 2, "Press any of the Arrow-Keys to move the cursor.", 0)
+			Stdwin.Addstr(10, 2, "Press any of the Arrow-Keys\n to move the cursor.", 0)
 			Stdwin.Addch(x, y, '@', Color_pair(1))
 			Stdwin.Refresh()
 		}
