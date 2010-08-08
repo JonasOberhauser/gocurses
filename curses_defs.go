@@ -8,6 +8,7 @@ package curses
 const (
 	ERR = -0x1;
 	OK = 0;
+	A_NORMAL = 0;
 	A_ALTCHARSET = 0x400000;
 	A_BLINK = 0x80000;
 	A_BOLD = 0x200000;
@@ -17,9 +18,10 @@ const (
 	A_REVERSE = 0x40000;
 	A_STANDOUT = 0x10000;
 	A_UNDERLINE = 0x20000;
-	A_ATTRIBUTES = 0xffffff00;
+	A_ATTRIBUTES = -0x100;
 	A_CHARTEXT = 0xff;
 	A_COLOR = 0xff00;
+	WA_NORMAL = 0;
 	WA_ALTCHARSET = 0x400000;
 	WA_BLINK = 0x80000;
 	WA_BOLD = 0x200000;

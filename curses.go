@@ -232,7 +232,7 @@ func (win *Window) Addstr(x0, y0 int, str string, flags int32, v ...interface{})
 // Like AddStr, just that it tries to nicely align the string within the window.
 // A very simplistic algorithm. Whenever a newline starts or the next word is too long, we go
 // to the next line and perform a carriage return. 
-func (win *Window) AddStrAlign(x0, y0 int, str string, flags int32, v ...interface{}) {
+func (win *Window) AddstrAlign(x0, y0 int, str string, flags int32, v ...interface{}) {
 	in()
 	defer out()
 	lines := strings.Split( fmt.Sprintf(str, v), "\n", -1 )

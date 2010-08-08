@@ -79,7 +79,7 @@ func (p *Panel) ToTop() {
 func (p *Panel) ToBottom() {
 	in()
 	defer out()
-	C.top_panel( p.panel )
+	C.bottom_panel( p.panel )
 }
 
 func NewPanel( w *Window ) (p *Panel, err os.Error ) {
